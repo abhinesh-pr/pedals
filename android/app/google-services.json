@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "412076864932",
+    "firebase_url": "https://cycle-project-2c901-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "cycle-project-2c901",
+    "storage_bucket": "cycle-project-2c901.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:412076864932:android:7231d890f6adbc2b163d31",
+        "android_client_info": {
+          "package_name": "com.strixz.pedals"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAq3P53hT32m8MFM7WUQQywKD-MvifxaZs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
