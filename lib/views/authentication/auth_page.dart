@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:pedals/views/users/dashboard.dart';
+
+import '../../services/auth_service.dart';
+import '../../viewmodels/auth_model.dart';
+import 'otp_verification_page.dart';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -112,11 +119,11 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("User ID", style: TextStyle(color: Colors.black)),
+            Text("Email", style: TextStyle(color: Colors.black)),
             SizedBox(height: 5.h),
             TextField(
-              controller: _studentIdController,
-              decoration: _inputDecoration("Student/Employee ID"),
+              controller: _loginEmailController,
+              decoration: _inputDecoration("student@kgkite.ac.in"),
             ),
             SizedBox(height: 10.h),
             Text("Password", style: TextStyle(color: Colors.black)),
@@ -131,9 +138,36 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               width: double.infinity,
               child: ElevatedButton(
                 style: _buttonStyle(),
-                onPressed: () {
-                  // Handle user login
+                onPressed: () async {
+                  final AuthService authService = AuthService();
+                  final email = _loginEmailController.text.trim();
+                  final password = _loginPasswordController.text.trim();
+
+                  if (email.isNotEmpty && password.isNotEmpty) {
+                    AuthCredentials credentials = AuthCredentials(email: email, password: password);
+                    String result = await authService.loginUser(credentials);
+
+                    if (result == "success") {
+                      Get.offAll(Dashboard(username: "Mee", email: "email"));
+                      // Navigate to the next screen or show success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Login successful!")),
+                      );
+
+                      // Example: Navigator.pushReplacement(...)
+                    } else {
+                      // Show error message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Login failed: $result")),
+                      );
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Please enter email and password.")),
+                    );
+                  }
                 },
+
                 child: Text("Login", style: TextStyle(fontSize: 16.sp)),
               ),
             ),
@@ -246,7 +280,56 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               width: double.infinity,
               child: ElevatedButton(
                 style: _buttonStyle(),
-                onPressed: () {}, // Placeholder
+                onPressed: () async {
+                  final fullName = _signUpNameController.text.trim();
+                  final userId = _studentIdController.text.trim();
+                  final email = _signUpEmailController.text.trim();
+                  final password = _signUpPasswordController.text.trim();
+                  final confirmPassword = _confirmPasswordController.text.trim();
+
+                  if (fullName.isEmpty || userId.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+                    Get.snackbar("Error", "All fields are required");
+                    return;
+                  }
+
+                  if (password != confirmPassword) {
+                    Get.snackbar("Error", "Passwords do not match");
+                    return;
+                  }
+
+                  final AuthService _authService = AuthService();
+                  bool alreadyExists = await _authService.isEmailRegistered(email, password);
+
+                  if (alreadyExists) {
+                    Get.snackbar("Error", "Email already registered");
+                    return;
+                  }
+                  bool userIdExists = await AuthService().isUserIdTaken(userId);
+
+                  if (userIdExists) {
+                    Get.snackbar('Error', 'User ID already taken. Try another one.');
+                    return;
+                  }
+
+
+                  String? otp = await _authService.sendOtp(email);
+                  if (otp != null) {
+                    final signUpModel = SignUpModel(
+                      fullName: fullName,
+                      userId: userId,
+                      email: email,
+                      password: password,
+                    );
+
+                    Get.to(() => OTPverification(
+                      signUpModel: signUpModel,
+                      sentOtp: otp,
+                    ));
+                  } else {
+                    Get.snackbar("Error", "Failed to send OTP. Try again.");
+                  }
+                },
+                // Placeholder
                 child: Text("Sign Up", style: TextStyle(fontSize: 16.sp)),
               ),
             ),
