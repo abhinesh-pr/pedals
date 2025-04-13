@@ -1,126 +1,138 @@
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import '../../services/auth_service.dart';
-// import '../../viewmodels/auth_model.dart';
-// import '../users/dashboard.dart';
-//
-// class OTPVerificationPage extends StatefulWidget {
-//   final SignUpModel signUpModel;
-//   final String sentOtp;
-//
-//   const OTPVerificationPage({
-//     Key? key,
-//     required this.signUpModel,
-//     required this.sentOtp,
-//   }) : super(key: key);
-//
-//   @override
-//   State<OTPVerificationPage> createState() => _OTPVerificationPageState();
-// }
-//
-// class _OTPVerificationPageState extends State<OTPVerificationPage> {
-//   final List<TextEditingController> otpControllers =
-//   List.generate(6, (_) => TextEditingController());
-//   final AuthService _authService = AuthService();
-//   bool isLoading = false;
-//
-//   void _verifyOtp() async {
-//     setState(() => isLoading = true);
-//
-//     String otp = otpControllers.map((controller) => controller.text).join();
-//     String result = await _authService.signUpUserWithOtp(
-//       signUpModel: widget.signUpModel,
-//       enteredOtp: otp,
-//       sentOtp: widget.sentOtp,
-//     );
-//
-//     setState(() => isLoading = false);
-//
-//     if (result == "success") {
-//       Get.snackbar("Success", "Account created successfully!");
-//       Get.offAll(Dashboard(username: 'Mee', email: 'myself',)); // or wherever you navigate after success
-//     } else {
-//       Get.snackbar("Error", result, snackPosition: SnackPosition.BOTTOM);
-//     }
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: null, // No AppBar in the second page design
-//       body: SingleChildScrollView(
-//         child: Container(
-//           height: MediaQuery.of(context).size.height,
-//           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 60),
-//           decoration: BoxDecoration(
-//             color: Theme.of(context).colorScheme.background,
-//           ),
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               Text(
-//                 "Enter OTP",
-//                 style: TextStyle(
-//                     fontSize: 30,
-//                     fontWeight: FontWeight.bold,
-//                     color: Theme.of(context).colorScheme.primary),
-//               ),
-//               SizedBox(height: 20),
-//               Text("A verification code has been sent to ${widget.signUpModel.email}"),
-//               SizedBox(height: 30),
-//               _buildOtpFields(),
-//               SizedBox(height: 20),
-//               isLoading
-//                   ? CircularProgressIndicator()
-//                   : ElevatedButton(
-//                 onPressed: _verifyOtp,
-//                 child: Text(
-//                   "Verify OTP",
-//                   style: TextStyle(color: Colors.white),
-//                 ),
-//               ),
-//               SizedBox(height: 20),
-//               TextButton(
-//                 onPressed: () {
-//                   // Handle resend OTP action
-//                 },
-//                 child: Text("Resend OTP"),
-//               ),
-//               SizedBox(height: 20),
-//               TextButton(
-//                 onPressed: () => Get.off(() => LoginPage()),
-//                 child: Text("Back to Login"),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget _buildOtpFields() {
-//     return Row(
-//       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//       children: List.generate(6, (index) {
-//         return SizedBox(
-//           width: 40,
-//           child: TextField(
-//             controller: otpControllers[index],
-//             keyboardType: TextInputType.number,
-//             textAlign: TextAlign.center,
-//             maxLength: 1,
-//             decoration: InputDecoration(
-//               counterText: "",
-//               border: OutlineInputBorder(),
-//             ),
-//             onChanged: (value) {
-//               if (value.length == 1 && index < 5) {
-//                 FocusScope.of(context).nextFocus();
-//               }
-//             },
-//           ),
-//         );
-//       }),
-//     );
-//   }
-// }
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../services/auth_service.dart';
+
+class ForgotPasswordPage extends StatefulWidget {
+  const ForgotPasswordPage({Key? key}) : super(key: key);
+
+  @override
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+}
+
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final AuthService _authService = AuthService();
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _sendResetRequest() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+    final email = _emailController.text.trim();
+
+    try {
+      await _authService.sendPasswordResetEmail(email);
+    } on FirebaseAuthException catch (e) {
+      Get.snackbar('Error','Internal Error Occured');
+
+      // 🔒 Optional: Log the actual error for dev/debug purposes
+      debugPrint('Password reset error: ${e.message}');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                Text(
+                  'Forgot Password',
+                  style: GoogleFonts.poppins(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: theme.primaryColorDark,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Enter your email to receive a password reset link.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Email Address',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          prefixIcon: const Icon(Icons.email_outlined),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter email';
+                          } else if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                            return 'Enter a valid email';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 30),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _sendResetRequest,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.primaryColor,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: _isLoading
+                              ? const CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                              : const Text(
+                            'Send Reset Link',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'Back to Login',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

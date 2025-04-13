@@ -215,22 +215,54 @@ class _OTPverificationState extends State<OTPverification> {
                   FadeInDown(
                     delay: Duration(milliseconds: 800),
                     duration: Duration(milliseconds: 500),
-                    child: MaterialButton(
-                      elevation: 0,
-                      onPressed: _verifyOtp, //_code.length < 4 ? () => {} : () { verify(); },
-                      color: Colors.orange.shade400,
-                      minWidth: MediaQuery.of(context).size.width * 0.8,
-                      height: 50,
-                      child: _isLoading ? Container(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          backgroundColor: Colors.white,
-                          strokeWidth: 3,
-                          color: Colors.black,
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _isLoading || _isVerified ? null : _verifyOtp,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue.shade600, // Active background color
+                            disabledBackgroundColor: Colors.blue.shade300, // Disabled background color
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: AnimatedSwitcher(
+                            duration: Duration(milliseconds: 300),
+                            transitionBuilder: (Widget child, Animation<double> animation) {
+                              return FadeTransition(opacity: animation, child: child);
+                            },
+                            child: _isLoading
+                                ? SizedBox(
+                              key: ValueKey("loading"),
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                                : _isVerified
+                                ? Icon(
+                              Icons.check_circle,
+                              key: ValueKey("verified"),
+                              color: Colors.white,
+                              size: 28,
+                            )
+                                : Text(
+                              "Verify",
+                              key: ValueKey("verifyText"),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                         ),
-                      ) : _isVerified ? Icon(Icons.check_circle, color: Colors.white, size: 30,) : Text("Verify", style: TextStyle(color: Colors.white),),
-                    ),
+                      )
+
                   )
                 ],)
           ),

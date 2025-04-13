@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:pedals/views/authentication/forgot_pass_page.dart';
 import 'package:pedals/views/users/dashboard.dart';
 
 import '../../services/auth_service.dart';
@@ -175,7 +176,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
             Center(
               child: TextButton(
                 onPressed: () {
-                  // Handle forgot password
+                  Get.to(ForgotPasswordPage());
                 },
                 child: Text(
                   "Forgot Password?",
@@ -304,7 +305,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                     Get.snackbar("Error", "Email already registered");
                     return;
                   }
-                  bool userIdExists = await AuthService().isUserIdTaken(userId);
+                  bool userIdExists = await AuthService().isUserIdTaken(userId.toUpperCase());
 
                   if (userIdExists) {
                     Get.snackbar('Error', 'User ID already taken. Try another one.');
@@ -316,7 +317,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                   if (otp != null) {
                     final signUpModel = SignUpModel(
                       fullName: fullName,
-                      userId: userId,
+                      userId: userId.toUpperCase(),
                       email: email,
                       password: password,
                     );

@@ -5,9 +5,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../viewmodels/auth_model.dart';
+import 'dart:convert'; // for utf8.encode
+import 'package:crypto/crypto.dart'; // for hashing
+
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  String hashPassword(String password) {
+    final bytes = utf8.encode(password);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
 
   Future<bool> isUserIdTaken(String userId) async {
     final result = await FirebaseFirestore.instance
@@ -130,7 +140,7 @@ class AuthService {
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      Get.snackbar('Success', 'Password reset email sent!');
+      Get.snackbar('Success', 'If the email exists, a reset link has been sent.');
     } catch (e) {
       Get.snackbar('Error', 'Failed: ${e.toString()}');
     }
