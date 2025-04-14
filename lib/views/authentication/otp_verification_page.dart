@@ -8,7 +8,7 @@ import 'package:get/get_core/src/get_main.dart';
 
 import '../../services/auth_service.dart';
 import '../../viewmodels/auth_model.dart';
-import '../users/dashboard.dart';
+import '../users/user_dashboard.dart';
 
 class OTPverification extends StatefulWidget {
   final SignUpModel signUpModel;
@@ -82,7 +82,7 @@ class _OTPverificationState extends State<OTPverification> {
 
     if (result == "success") {
       Get.snackbar("Success", "Account created successfully!");
-      Get.offAll(Dashboard(username: 'Mee', email: 'myself',)); // or wherever you navigate after success
+      Get.offAll(MapsPage()); // or wherever you navigate after success
     } else {
       Get.snackbar("Error", result, snackPosition: SnackPosition.BOTTOM);
     }

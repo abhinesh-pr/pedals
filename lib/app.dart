@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pedals/routes/app_router.dart';
 import 'package:pedals/routes/app_routes.dart';
 import 'package:pedals/views/authentication/auth_page.dart';
-import 'package:pedals/views/users/dashboard.dart';
+import 'package:pedals/views/users/user_dashboard.dart';
 
 import 'controllers/auth_controller.dart';
 import 'core/utils/themes.dart';
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
             if (user == null) {
               return  AuthPage(); // Replace with your login page
             } else {
-              return  Dashboard(username: 'naanee', email: 'nanthan',); // Replace with your dashboard page
+              return  MapsPage(); // Replace with your dashboard page
             }
           }),
         );

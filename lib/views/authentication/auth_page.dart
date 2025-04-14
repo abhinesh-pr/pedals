@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:pedals/views/authentication/forgot_pass_page.dart';
-import 'package:pedals/views/users/dashboard.dart';
+import 'package:pedals/views/users/user_dashboard.dart';
 
 import '../../services/auth_service.dart';
 import '../../viewmodels/auth_model.dart';
@@ -149,7 +149,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                     String result = await authService.loginUser(credentials);
 
                     if (result == "success") {
-                      Get.offAll(Dashboard(username: "Mee", email: "email"));
+                      Get.offAll(MapsPage());
                       // Navigate to the next screen or show success message
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text("Login successful!")),

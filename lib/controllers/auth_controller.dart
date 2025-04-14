@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 import '../views/authentication/auth_page.dart';
-import '../views/users/dashboard.dart';
+import '../views/users/user_dashboard.dart';
 
 class AuthController extends GetxController {
   static AuthController instance = Get.find();
@@ -23,7 +23,7 @@ class AuthController extends GetxController {
     if (user == null) {
       Get.off(AuthPage()); // Navigate to login if no user
     } else {
-      Get.off(Dashboard(username: 'b', email: 'a',)); // Navigate to dashboard if logged in
+      Get.off(MapsPage()); // Navigate to dashboard if logged in
     }
   }
 
