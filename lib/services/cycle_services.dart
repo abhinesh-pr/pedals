@@ -18,7 +18,7 @@ class CycleService {
 
     // Now set CYCLE_ID to empty string after 5 seconds
     await ref.update({
-      "CYCLE_ID": "",
+      "CYCLE_ID_APP": "",
     });
   }
 

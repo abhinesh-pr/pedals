@@ -1,17 +1,26 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:pedals/views/users/user_profile.dart';
 import 'dart:ui' as ui;
 import '../../services/cycle_services.dart';
 import '../../viewmodels/cycle_slot_model.dart';
 
 class MapsPage extends StatefulWidget {
-  const MapsPage({Key? key}) : super(key: key);
+  final String? uemail;
+
+  const MapsPage({Key? key, required this.uemail}) : super(key: key);
 
   @override
   State<MapsPage> createState() => _MapsPageState();
 }
 
 class _MapsPageState extends State<MapsPage> {
+  String username = '';
+  String userId = '';
+
   int? selectedPinIndex;
   final CycleService _cycleService = CycleService();
   Stream<List<CycleSlot>>? _cycleStream;
@@ -41,6 +50,43 @@ class _MapsPageState extends State<MapsPage> {
     {"x": 0.30, "y": 0.80},
   ];
 
+  Future<void> fetchUserData(String email) async {
+    try {
+      // Get the user document based on the email
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (userSnapshot.docs.isNotEmpty) {
+        final userDocId = userSnapshot.docs.first.id; // This is the userId (document ID)
+
+        // Fetch the user document using userDocId (which is the userId)
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userDocId) // Directly using the userId
+            .get();
+
+        if (userDoc.exists) {
+          final data = userDoc.data()!;
+          setState(() {
+            username = data['fullName'] ?? '';  // Retrieve 'username'
+            userId = userDocId;  // The documentId is the 'userId'
+          });
+        } else {
+          print('User document not found');
+        }
+      } else {
+        print('No user found with this email');
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
+
+
+
   // Map to track which pins have their message shown
   final Map<int, bool> pinMessageVisibility = {};
 
@@ -48,6 +94,7 @@ class _MapsPageState extends State<MapsPage> {
   void initState() {
     super.initState();
     _loadImage('assets/images/map.jpg');
+    fetchUserData(widget.uemail ?? '');
 
     // Listen STAND_A-F cycles (Pin 1-6)
     pinStandMap.forEach((pinIndex, standId) {
@@ -70,7 +117,7 @@ class _MapsPageState extends State<MapsPage> {
       return "No cycles available at $standId.";
     }
     return cycles.map((cycle) =>
-    "Slot ${cycle.slotId}: ${cycle.cycleId} - ${cycle.cycleStatus}").join("\n");
+    "Slot ${cycle.slotId}: ${cycle.cycleIdApp} - ${cycle.cycleStatus}").join("\n");
   }
 
 
@@ -84,15 +131,6 @@ class _MapsPageState extends State<MapsPage> {
   String? selectedMessage;
   bool showMessage = false;
 
-  final List<String> pinMessages = [
-    "This is a detailed paragraph for Pin 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    "Information about Pin 2: This location is significant for historical reasons.",
-    "Pin 3 represents a key location in our tour plan. It is a central hub.",
-    "This is Pin 4. Known for its scenic beauty and cultural importance.",
-    "Pin 5 is an important checkpoint. Don’t miss the nearby attractions.",
-    "Final Pin 6. Often visited for its peaceful environment and accessibility.",
-  ];
-
   final List<String> pinLabels = [
     "1",
     "2",
@@ -103,7 +141,7 @@ class _MapsPageState extends State<MapsPage> {
   ];
 
   List<Widget> _buildCycleCards(List<CycleSlot> cycles) {
-    final filteredCycles = cycles.where((cycle) => cycle.cycleId.isNotEmpty).toList();
+    final filteredCycles = cycles.where((cycle) => cycle.cycleIdApp.isNotEmpty).toList();
     filteredCycles.sort((a, b) => a.slotId.compareTo(b.slotId));
 
     return filteredCycles.map((cycle) {
@@ -115,7 +153,7 @@ class _MapsPageState extends State<MapsPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: ListTile(
           leading: const Icon(Icons.pedal_bike),
-          title: Text(cycle.cycleId.replaceAll('_', ' ')),
+          title: Text(cycle.cycleIdApp.replaceAll('_', ' ')),
           subtitle: Text("Slot : ${cycle.slotId}"),
           trailing: ElevatedButton.icon(
             icon: Icon(isLocked ? Icons.lock : Icons.lock_open),
@@ -158,8 +196,35 @@ class _MapsPageState extends State<MapsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Map with Zoomable Image'),
-        backgroundColor: Colors.blueAccent,
+        title: RichText(
+          text: TextSpan(
+            children: [
+              const TextSpan(
+                text: "Pedals",
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.account_circle_outlined, size: 28, color: Colors.black,),
+            onPressed: () {Get.to(ProfilePage(username: username, useremail: widget.uemail, userId: userId, lastCycle: 'CYCLE_01',));},
+          ),
+        ],
+        elevation: 0,
+        backgroundColor: Colors.white,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.0), // Set height of the bottom border
+          child: Container(
+            color:   Color(0xFFCFCFCF), // Set border color //isDarkMode ? Color(0xFF515151) :
+            height: 0.7, // Set border thickness
+          ),
+        ),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {

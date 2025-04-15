@@ -23,7 +23,7 @@ class AuthController extends GetxController {
     if (user == null) {
       Get.off(AuthPage()); // Navigate to login if no user
     } else {
-      Get.off(MapsPage()); // Navigate to dashboard if logged in
+      Get.off(MapsPage(uemail: user.email,)); // Navigate to dashboard if logged in
     }
   }
 

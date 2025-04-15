@@ -13,7 +13,8 @@ import '../users/user_dashboard.dart';
 class OTPverification extends StatefulWidget {
   final SignUpModel signUpModel;
   final String sentOtp;
-  const OTPverification({ Key? key, required this.signUpModel, required this.sentOtp }) : super(key: key);
+  final String email;
+  const OTPverification({ Key? key, required this.signUpModel,required this.email, required this.sentOtp }) : super(key: key);
 
   @override
   _OTPverificationState createState() => _OTPverificationState();
@@ -82,7 +83,7 @@ class _OTPverificationState extends State<OTPverification> {
 
     if (result == "success") {
       Get.snackbar("Success", "Account created successfully!");
-      Get.offAll(MapsPage()); // or wherever you navigate after success
+      Get.offAll(MapsPage(uemail: widget.email,)); // or wherever you navigate after success
     } else {
       Get.snackbar("Error", result, snackPosition: SnackPosition.BOTTOM);
     }

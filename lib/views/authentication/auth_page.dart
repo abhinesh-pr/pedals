@@ -149,7 +149,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                     String result = await authService.loginUser(credentials);
 
                     if (result == "success") {
-                      Get.offAll(MapsPage());
+                      Get.offAll(MapsPage(uemail: email,));
                       // Navigate to the next screen or show success message
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text("Login successful!")),
@@ -323,6 +323,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                     );
 
                     Get.to(() => OTPverification(
+                      email: email,
                       signUpModel: signUpModel,
                       sentOtp: otp,
                     ));

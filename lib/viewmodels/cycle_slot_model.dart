@@ -1,5 +1,6 @@
 class CycleSlot {
   final String cycleId;
+  final String cycleIdApp;
   final String cycleStatus;
   final int slotId;
   final String standId;
@@ -8,6 +9,7 @@ class CycleSlot {
 
   CycleSlot({
     required this.cycleId,
+    required this.cycleIdApp,
     required this.cycleStatus,
     required this.slotId,
     required this.standId,
@@ -18,6 +20,7 @@ class CycleSlot {
   factory CycleSlot.fromJson(String slotId, Map<dynamic, dynamic> json) {
     return CycleSlot(
       cycleId: json['CYCLE_ID'] ?? '',
+      cycleIdApp: json['CYCLE_ID_APP'] ?? '',
       cycleStatus: json['CYCLE_STATUS'] ?? '',
       slotId: json['SLOT_ID'] ?? 0,
       standId: json['STAND_ID'] ?? '',
