@@ -23,7 +23,6 @@ class _MapsPageState extends State<MapsPage> {
 
   int? selectedPinIndex;
   final CycleService _cycleService = CycleService();
-  Stream<List<CycleSlot>>? _cycleStream;
   List<CycleSlot> fetchedCycles = [];
   final Map<int, List<CycleSlot>> pinCycles = {};
   final Map<int, Stream<List<CycleSlot>>> pinStreams = {};
