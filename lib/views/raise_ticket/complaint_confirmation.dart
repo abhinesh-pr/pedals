@@ -7,7 +7,6 @@ class ComplaintConfirmationPage extends StatelessWidget {
   final String complaintId;
   final String category;
   final String service;
-  final String type;
   final String description;
   final List<String> uploadedFiles;
 
@@ -16,7 +15,6 @@ class ComplaintConfirmationPage extends StatelessWidget {
     required this.complaintId,
     required this.category,
     required this.service,
-    required this.type,
     required this.description,
     required this.uploadedFiles,
   });
@@ -103,7 +101,6 @@ class ComplaintConfirmationPage extends StatelessWidget {
             const SizedBox(height: 16),
             _buildDetailRow("Category", category),
             _buildDetailRow("Service", service),
-            _buildDetailRow("Complaint Type", type),
             const SizedBox(height: 12),
 
             // Description Section
