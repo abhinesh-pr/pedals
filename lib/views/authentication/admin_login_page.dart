@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -134,7 +135,7 @@ class _AuthPageState extends State<AdminLoginPage> with SingleTickerProviderStat
                     String result = await authService.loginUser(credentials);
 
                     if (result == "success") {
-                      Get.offAll(MapsPage(uemail: email,));
+                      Get.offAll(UserDashboard(uemail: email,));
                       // Navigate to the next screen or show success message
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text("Login successful!")),

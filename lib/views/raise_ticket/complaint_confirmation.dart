@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+import 'package:pedals/views/users/user_dashboard.dart';
 
 
 class ComplaintConfirmationPage extends StatelessWidget {
+  final String? email;
   final String complaintId;
   final String category;
   final String service;
@@ -12,6 +16,7 @@ class ComplaintConfirmationPage extends StatelessWidget {
 
   const ComplaintConfirmationPage({
     super.key,
+    required this.email,
     required this.complaintId,
     required this.category,
     required this.service,
@@ -40,8 +45,9 @@ class ComplaintConfirmationPage extends StatelessWidget {
           children: [
             // Success Icon
             Lottie.asset(
-              'assets/success_lottie.json',
-              height: 120,
+              'assets/lotties/success_lottie.json',
+              height: 80,
+              repeat: false,
             ),
             const SizedBox(height: 16),
 
@@ -143,8 +149,7 @@ class ComplaintConfirmationPage extends StatelessWidget {
             // Navigation Button
             ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacementNamed(context,
-                    mycomplaints_view!); // Redirect back to home or dashboard
+                Get.to(UserDashboard(uemail: email));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,

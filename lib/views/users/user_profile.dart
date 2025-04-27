@@ -4,20 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pedals/views/authentication/auth_page.dart';
+import 'package:pedals/views/raise_ticket/raise_complaint.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../raise_ticket/complaint_records.dart';
+
 class ProfilePage extends StatefulWidget {
-  final String username;
-  final String? useremail;
-  final String userId;
-  final String lastCycle;
 
   const ProfilePage({
     Key? key,
-    required this.username,
-    required this.useremail,
-    required this.userId,
-    required this.lastCycle,
   }) : super(key: key);
 
   @override
@@ -25,6 +20,18 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  String? fullName;
+  String? email;
+  String? userId;
+  String? lastCycle; // If you want to store this too later
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+
 
   // Controllers for the change password fields
   TextEditingController _currentPasswordController = TextEditingController();
@@ -96,10 +103,23 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Future<void> loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      fullName = prefs.getString('fullName') ?? 'No Name';
+      email = prefs.getString('email') ?? 'No Email';
+      userId = prefs.getString('userId') ?? 'No UserId';
+      // lastCycle = prefs.getString('lastCycle') ?? 'No Cycle'; // If you have lastCycle too
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     // Check if system is in dark mode
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+
 
     return Scaffold(
       appBar: AppBar(
@@ -124,7 +144,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ListTile(
                       leading: Icon(Icons.person),
                       title: Text(
-                        "${widget.username}",
+                        "${fullName ?? ''}",
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
@@ -132,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ListTile(
                       leading: Icon(Icons.email),
                       title: Text(
-                        "${widget.useremail}",
+                        "${email ?? ''}",
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
@@ -140,7 +160,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ListTile(
                       leading: Icon(Icons.drive_eta_rounded),
                       title: Text(
-                        "${widget.userId}",
+                        "${userId ?? ''}",
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
@@ -148,7 +168,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ListTile(
                       leading: Icon(Icons.wheelchair_pickup),
                       title: Text(
-                        "Last Cycle : ${widget.lastCycle}",
+                        "Last Cycle : Cycle_01",
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
@@ -163,6 +183,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
+                      Get.to(ComplaintPage());
                     },
                     icon: Padding(
                       padding: EdgeInsets.only(left: 16.0),
@@ -198,6 +219,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
+                      Get.to(ComplaintRecords());
                     },
                     icon: Padding(
                       padding: EdgeInsets.only(left: 16.0),

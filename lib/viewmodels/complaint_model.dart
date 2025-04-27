@@ -1,8 +1,9 @@
-// lib/models/complaint.dart
+// complaint_model.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Complaint {
   final String category;
   final String service;
-  final String type;
   final String complaintNumber;
   final double amount;
   final String complaintDate;
@@ -14,7 +15,6 @@ class Complaint {
   Complaint({
     required this.category,
     required this.service,
-    required this.type,
     required this.complaintNumber,
     required this.amount,
     required this.complaintDate,
@@ -24,33 +24,35 @@ class Complaint {
     required this.userId,
   });
 
-  Map<String, dynamic> toJson() => {
-    "category": category,
-    "service": service,
-    "type": type,
-    "complaintNumber": complaintNumber,
-    "amount": amount,
-    "complaintDate": complaintDate,
-    "complaintOffice": complaintOffice,
-    "description": description,
-    "supportingDocuments": supportingDocuments,
-    "userId": userId,
-  };
-}
+  // Convert Complaint object to Firestore document
+  Map<String, dynamic> toMap() {
+    return {
+      'category': category,
+      'service': service,
+      'complaintNumber': complaintNumber,
+      'amount': amount,
+      'complaintDate': complaintDate,
+      'complaintOffice': complaintOffice,
+      'description': description,
+      'supportingDocuments': supportingDocuments,
+      'userId': userId,
+    };
+  }
 
-class ComplaintResponse {
-  final String message;
-  final String complaintId;
+  // Create Complaint object from Firestore document
+  factory Complaint.fromDocument(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
 
-  ComplaintResponse({
-    required this.message,
-    required this.complaintId,
-  });
-
-  factory ComplaintResponse.fromJson(Map<String, dynamic> json) {
-    return ComplaintResponse(
-      message: json['message'],
-      complaintId: json['complaintId'],
+    return Complaint(
+      category: data['category'] ?? '',
+      service: data['service'] ?? '',
+      complaintNumber: data['complaintNumber'] ?? '',
+      amount: (data['amount'] ?? 0).toDouble(),
+      complaintDate: data['complaintDate'] ?? '',
+      complaintOffice: data['complaintOffice'] ?? '',
+      description: data['description'] ?? '',
+      supportingDocuments: List<String>.from(data['supportingDocuments'] ?? []),
+      userId: data['userId'] ?? '',
     );
   }
 }

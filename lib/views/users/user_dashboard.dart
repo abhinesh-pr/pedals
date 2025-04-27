@@ -8,16 +8,16 @@ import 'dart:ui' as ui;
 import '../../services/cycle_services.dart';
 import '../../viewmodels/cycle_slot_model.dart';
 
-class MapsPage extends StatefulWidget {
+class UserDashboard extends StatefulWidget {
   final String? uemail;
 
-  const MapsPage({Key? key, required this.uemail}) : super(key: key);
+  const UserDashboard({Key? key, required this.uemail}) : super(key: key);
 
   @override
-  State<MapsPage> createState() => _MapsPageState();
+  State<UserDashboard> createState() => _UserDashboard();
 }
 
-class _MapsPageState extends State<MapsPage> {
+class _UserDashboard extends State<UserDashboard> {
   String username = '';
   String userId = '';
 
@@ -213,7 +213,7 @@ class _MapsPageState extends State<MapsPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.account_circle_outlined, size: 28, color: Colors.black,),
-            onPressed: () {Get.to(ProfilePage(username: username, useremail: widget.uemail, userId: userId, lastCycle: 'CYCLE_01',));},
+            onPressed: () {Get.to(ProfilePage());},
           ),
         ],
         elevation: 0,

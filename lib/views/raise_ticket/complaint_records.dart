@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
-class MyComplaintsPage extends StatefulWidget {
+class ComplaintRecords extends StatefulWidget {
+
+  const ComplaintRecords({super.key,});
   @override
-  State<MyComplaintsPage> createState() => _MyComplaintsPageState();
+  State<ComplaintRecords> createState() => _ComplaintRecords();
 }
 
-class _MyComplaintsPageState extends State<MyComplaintsPage> {
+class _ComplaintRecords extends State<ComplaintRecords> {
   String? userId;
+  String? email;
 
   String? get raiseTicket => null;
 
@@ -15,7 +19,17 @@ class _MyComplaintsPageState extends State<MyComplaintsPage> {
   void initState() {
     super.initState();
     _loadUserId();
+    loadUserData();
   }
+
+  Future<void> loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      email = prefs.getString('email') ?? 'No Email';
+      // lastCycle = prefs.getString('lastCycle') ?? 'No Cycle'; // If you have lastCycle too
+    });
+  }
+
 
   Future<void> _loadUserId() async {
     // Simulate userId loading (you can load from SharedPreferences or other source)

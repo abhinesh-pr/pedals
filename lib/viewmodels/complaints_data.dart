@@ -1,30 +1,36 @@
 // lib/models/complaint_data.dart
 class ComplaintData {
   static const List<String> categories = [
-    "Delivery Issue",
-    "Damaged Item",
-    "Wrong Address",
-    "Delayed Service",
-    "Missing Item",
-    "Other"
+    "Cycle Related",
+    "Stand/Slot",
+    "Locking/Unlocking",
+    "Application Related",
+    "Others"
   ];
 
-  static const List<String> services = [
-    "Registered Post",
-    "Speed Post",
-    "Parcel",
-    "Money Order",
-    "Philately",
-    "Banking Services",
-    "Insurance Services"
-  ];
-
-  static const List<String> types = [
-    "Delay",
-    "Lost Item",
-    "Wrong Delivery",
-    "Incomplete Delivery",
-    "Service Not Rendered",
-    "Other"
-  ];
+  static const Map<String, List<String>> servicesByCategory = {
+    "Cycle Related": [
+      "Cycle Not Available",
+      "Flat Tyre",
+      "Chain Problem",
+      "Brake Issue",
+    ],
+    "Stand/Slot": [
+      "Slot Not Working",
+      "Stand Power Issue",
+      "Stand Network Issue",
+    ],
+    "Locking/Unlocking": [
+      "Cycle Not Locking",
+      "Cycle Not Unlocking",
+      "Lock Mechanism Jammed",
+    ],
+    "Application Related": [
+      "App Crash",
+      "Login Issue",
+    ],
+    "Others": [
+      "Other Issues",
+    ],
+  };
 }

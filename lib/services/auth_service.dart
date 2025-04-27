@@ -58,9 +58,20 @@ class AuthService {
         'createdAt': FieldValue.serverTimestamp(), // Automatically sets the creation time
       });
 
-      // Store login state in SharedPreferences
+      try {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('fullName', signUpModel.fullName);
+        await prefs.setString('email', signUpModel.email);
+        await prefs.setString('userId', signUpModel.userId);
+        await prefs.setBool('isLoggedIn', true);
+      } catch (e) {
+        print('Error saving data: $e');
+      }
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setBool('isLoggedIn', true);
+      String? testValue = prefs.getString('email');
+      print('Test Value: $testValue');
+
+
 
       return "success";
     } catch (e) {
@@ -71,21 +82,48 @@ class AuthService {
   // Login
   Future<String> loginUser(AuthCredentials credentials) async {
     try {
+      // Sign in the user
       UserCredential cred = await _auth.signInWithEmailAndPassword(
         email: credentials.email,
         password: credentials.password,
       );
 
       if (cred.user != null) {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setBool('isLoggedIn', true);
-        return "success";
+        String email = cred.user!.email ?? '';
+
+        // Query Firestore to get user document where email matches
+        QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .limit(1)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          // Extract user data
+          var userDoc = querySnapshot.docs.first;
+          String fullName = userDoc.data()['fullName'] ?? '';
+          String userId = userDoc.data()['userId'] ?? '';
+
+          // Save user data into SharedPreferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', true);
+          await prefs.setString('fullName', fullName);
+          await prefs.setString('email', email);
+          await prefs.setString('userId', userId);
+
+          return "success";
+        } else {
+          return "User data not found in database";
+        }
+      } else {
+        return "Login failed";
       }
-      return "Login failed";
     } catch (e) {
       return e.toString();
     }
   }
+
+
 
   // OTP sender
   Future<String?> sendOtp(String email) async {

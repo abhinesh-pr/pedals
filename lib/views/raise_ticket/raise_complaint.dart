@@ -3,24 +3,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pedals/views/raise_ticket/widgets/custom_input_fields.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:pedals/views/raise_ticket/widgets/custom_dropdown.dart';
 
-
 import '../../viewmodels/complaints_data.dart';
 import '../../viewmodels/complaint_model.dart';
-import 'complaints_confirmation_view.dart';
+import 'complaint_confirmation.dart';
 
 class ComplaintPage extends StatefulWidget {
-  const ComplaintPage({super.key});
+  const ComplaintPage({super.key,});
 
   @override
   State<ComplaintPage> createState() => _ComplaintPage();
 }
 
 class _ComplaintPage extends State<ComplaintPage> {
+  String? email;
+
   String? selectedCategory;
   String? selectedService;
   final TextEditingController descriptionController = TextEditingController();
@@ -32,7 +34,18 @@ class _ComplaintPage extends State<ComplaintPage> {
   void initState() {
     super.initState();
     _loadUserId();
+    loadUserData();
   }
+
+  Future<void> loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      email = prefs.getString('email') ?? 'No Email';
+      // lastCycle = prefs.getString('lastCycle') ?? 'No Cycle'; // If you have lastCycle too
+    });
+  }
+
+
 
   Future<void> _loadUserId() async {
     try {
@@ -119,6 +132,7 @@ class _ComplaintPage extends State<ComplaintPage> {
           service: selectedService!,
           description: descriptionController.text,
           uploadedFiles: uploadedFiles,
+          email: email,
         ),
       ),
     );

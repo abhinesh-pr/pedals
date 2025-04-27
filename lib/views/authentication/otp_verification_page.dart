@@ -83,7 +83,7 @@ class _OTPverificationState extends State<OTPverification> {
 
     if (result == "success") {
       Get.snackbar("Success", "Account created successfully!");
-      Get.offAll(MapsPage(uemail: widget.email,)); // or wherever you navigate after success
+      Get.offAll(UserDashboard(uemail: widget.email,)); // or wherever you navigate after success
     } else {
       Get.snackbar("Error", result, snackPosition: SnackPosition.BOTTOM);
     }

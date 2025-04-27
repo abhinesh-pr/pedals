@@ -177,7 +177,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                     String result = await authService.loginUser(credentials);
 
                     if (result == "success") {
-                      Get.offAll(MapsPage(uemail: email,));
+                      Get.offAll(UserDashboard(uemail: email,));
                       // Navigate to the next screen or show success message
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text("Login successful!")),

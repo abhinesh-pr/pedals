@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
             if (user == null) {
               return  AuthPage(); // Replace with your login page
             } else {
-              return  MapsPage(uemail: user.email); // Replace with your dashboard page
+              return  UserDashboard(uemail: user.email); // Replace with your dashboard page
             }
           }),
         );

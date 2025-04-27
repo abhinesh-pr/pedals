@@ -14,7 +14,7 @@ class CustomInputField extends StatelessWidget {
     required this.label,
     required this.hintText,
     this.controller,
-    this.maxLines = 1,
+    this.maxLines = 5,
     this.inputType = TextInputType.text,
   }) : super(key: key);
 
