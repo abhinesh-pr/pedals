@@ -12,7 +12,7 @@ class ComplaintConfirmationPage extends StatelessWidget {
   final String category;
   final String service;
   final String description;
-  final List<String> uploadedFiles;
+  //final List<String> uploadedFiles;
 
   const ComplaintConfirmationPage({
     super.key,
@@ -21,7 +21,7 @@ class ComplaintConfirmationPage extends StatelessWidget {
     required this.category,
     required this.service,
     required this.description,
-    required this.uploadedFiles,
+    //required this.uploadedFiles,
   });
 
   String? get mycomplaints_view => null;
@@ -126,25 +126,25 @@ class ComplaintConfirmationPage extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Uploaded Files Section
-            if (uploadedFiles.isNotEmpty) ...[
-              Text(
-                "Uploaded Files",
-                style: GoogleFonts.lato(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              ...uploadedFiles.map((file) => ListTile(
-                leading: Icon(Icons.insert_drive_file, color: Colors.red),
-                title: Text(
-                  file.split('/').last,
-                  style: GoogleFonts.lato(fontSize: 16),
-                ),
-              )),
-              const SizedBox(height: 16),
-            ],
+            // if (uploadedFiles.isNotEmpty) ...[
+            //   Text(
+            //     "Uploaded Files",
+            //     style: GoogleFonts.lato(
+            //       fontSize: 18,
+            //       fontWeight: FontWeight.bold,
+            //       color: Colors.black87,
+            //     ),
+            //   ),
+            //   const SizedBox(height: 8),
+            //   ...uploadedFiles.map((file) => ListTile(
+            //     leading: Icon(Icons.insert_drive_file, color: Colors.red),
+            //     title: Text(
+            //       file.split('/').last,
+            //       style: GoogleFonts.lato(fontSize: 16),
+            //     ),
+            //   )),
+            //   const SizedBox(height: 16),
+            // ],
 
             // Navigation Button
             ElevatedButton(

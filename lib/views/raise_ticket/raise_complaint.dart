@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pedals/views/raise_ticket/widgets/custom_input_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -12,6 +15,8 @@ import 'package:pedals/views/raise_ticket/widgets/custom_dropdown.dart';
 import '../../viewmodels/complaints_data.dart';
 import '../../viewmodels/complaint_model.dart';
 import 'complaint_confirmation.dart';
+import 'dart:io';
+
 
 class ComplaintPage extends StatefulWidget {
   const ComplaintPage({super.key,});
@@ -44,6 +49,64 @@ class _ComplaintPage extends State<ComplaintPage> {
       // lastCycle = prefs.getString('lastCycle') ?? 'No Cycle'; // If you have lastCycle too
     });
   }
+
+
+
+  // Future<String?> uploadFileToGoogleDrive(String filePath, String userId) async {
+  //   final dio = Dio();
+  //   dio.options.headers = {'Accept': 'application/json'};
+  //
+  //   // Read the file as bytes and encode it to Base64
+  //   final fileBytes = await File(filePath).readAsBytes();
+  //   final base64File = base64Encode(fileBytes);
+  //
+  //   final fileName = p.basename(filePath);
+  //   final mimeType = lookupMimeType(filePath) ?? 'application/octet-stream';
+  //
+  //   try {
+  //     // Send POST request to Google Apps Script
+  //     final response = await dio.post(
+  //       "https://script.google.com/macros/s/AKfycby-2_Hq_0Lj4QHPaHOEE9ZdnqRQ3RrJX_lL9lcytFjvNgq9dj-Ff2qh2XaP3A8Y4dDC/exec",
+  //       data: {
+  //         'base64': base64File,
+  //         'name': fileName,
+  //         'mimeType': mimeType,
+  //         'userId': userId,
+  //       },
+  //       options: Options(
+  //         responseType: ResponseType.json,
+  //         validateStatus: (status) {
+  //           return status! < 500; // Accept status codes below 500
+  //         },
+  //         followRedirects: false, // Ignore redirection
+  //       ),
+  //     );
+  //
+  //     final jsonResponse = response.data is String
+  //         ? jsonDecode(response.data)
+  //         : response.data;
+  //
+  //     if (jsonResponse['fileId'] != null) {
+  //       final fileId = jsonResponse['fileId'];
+  //       print("File uploaded successfully with ID: $fileId");
+  //       return fileId;
+  //     }
+  //     else if (response.statusCode == 200) {
+  //       print(response.statusCode);
+  //     }
+  //     else {
+  //       print("Error: ${response.statusCode}");
+  //       print('Error: ${jsonResponse['message']}');
+  //       return null; // Return null if error message exists
+  //     }
+  //
+  //   } catch (e) {
+  //     print("Error during upload: $e");
+  //     return null; // Return null if an exception occurs
+  //   }
+  // }
+
+
 
 
 
@@ -87,6 +150,9 @@ class _ComplaintPage extends State<ComplaintPage> {
   }
 
 
+
+
+
   Future<void> pickFiles() async {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
@@ -100,7 +166,7 @@ class _ComplaintPage extends State<ComplaintPage> {
     }
   }
 
-  void _handleSubmit() {
+  Future<void> _handleSubmit() async {
     if (selectedCategory == null ||
         selectedService == null ||
         descriptionController.text.trim().isEmpty ||
@@ -111,31 +177,66 @@ class _ComplaintPage extends State<ComplaintPage> {
       return;
     }
 
-    final complaint = Complaint(
-      category: selectedCategory!,
-      service: selectedService!,
-      complaintNumber: DateTime.now().millisecondsSinceEpoch.toString(),
-      amount: 0.0,
-      complaintDate: DateTime.now().toIso8601String(),
-      complaintOffice: "641042",
-      description: descriptionController.text.trim(),
-      supportingDocuments: uploadedFiles,
-      userId: userId!,
-    );
+    final complaintNumber = DateTime.now().millisecondsSinceEpoch.toString();
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ComplaintConfirmationPage(
-          complaintId: complaint.complaintNumber,
-          category: selectedCategory!,
-          service: selectedService!,
-          description: descriptionController.text,
-          uploadedFiles: uploadedFiles,
-          email: email,
+    final complaint = {
+      'category': selectedCategory,
+      'service': selectedService,
+      'complaintNumber': complaintNumber,
+      'complaintDate': DateTime.now().toIso8601String(),
+      'description': descriptionController.text.trim(),
+      //'supportingDocuments': uploadedLinks, // Uncomment if using
+      'userId': userId,
+      'complaint_status': 'Submitted',
+
+    };
+
+    // Show Lottie loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.6), // ⬅️ Higher opacity
+      builder: (context) => Center(
+        child: Material(
+          color: Colors.transparent, // Keep the background of the Lottie container transparent
+          child: Container(
+            width: 180,
+            height: 180,
+            decoration: BoxDecoration(
+              color: Colors.white, // Optional: background for animation
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Lottie.asset('assets/lotties/cycle_lottie.json'),
+          ),
         ),
       ),
     );
+
+    try {
+      // Save to Firestore
+      await FirebaseFirestore.instance
+          .collection('complaints')
+          .doc(complaintNumber)
+          .set(complaint);
+
+      Navigator.pop(context); // Close loading dialog
+
+      // Navigate to confirmation page
+      Get.off(() => ComplaintConfirmationPage(
+        complaintId: complaintNumber,
+        category: selectedCategory!,
+        service: selectedService!,
+        description: descriptionController.text,
+        //uploadedFiles: uploadedLinks,
+        email: email,
+      ));
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error submitting complaint: $e')),
+      );
+    }
   }
 
   @override
@@ -219,39 +320,39 @@ class _ComplaintPage extends State<ComplaintPage> {
             maxLines: 5,
           ),
           const SizedBox(height: 24),
-          Text(
-            'Supporting Documents',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          GestureDetector(
-            onTap: pickFiles,
-            child: DottedBorder(
-              color: Colors.grey,
-              dashPattern: [6, 4],
-              borderType: BorderType.RRect,
-              radius: const Radius.circular(12),
-              child: Container(
-                height: 150,
-                width: double.infinity,
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.cloud_upload_outlined, size: 50, color: Colors.grey),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Tap to Upload',
-                      style: GoogleFonts.poppins(color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // Text(
+          //   'Supporting Documents',
+          //   style: GoogleFonts.poppins(
+          //     fontSize: 14,
+          //     fontWeight: FontWeight.w600,
+          //   ),
+          // ),
+          // const SizedBox(height: 8),
+          // GestureDetector(
+          //   onTap: pickFiles,
+          //   child: DottedBorder(
+          //     color: Colors.grey,
+          //     dashPattern: [6, 4],
+          //     borderType: BorderType.RRect,
+          //     radius: const Radius.circular(12),
+          //     child: Container(
+          //       height: 150,
+          //       width: double.infinity,
+          //       alignment: Alignment.center,
+          //       child: Column(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         children: [
+          //           const Icon(Icons.cloud_upload_outlined, size: 50, color: Colors.grey),
+          //           const SizedBox(height: 8),
+          //           Text(
+          //             'Tap to Upload',
+          //             style: GoogleFonts.poppins(color: Colors.grey),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
           const SizedBox(height: 12),
           if (uploadedFiles.isNotEmpty)
             ...uploadedFiles.map((file) => ListTile(
@@ -288,81 +389,5 @@ class _ComplaintPage extends State<ComplaintPage> {
     );
   }
 
-  Widget _buildDropdown({
-    required String label,
-    required String? value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: value,
-          isExpanded: true,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-          ),
-          hint: Text('Select $label'),
-          items: items.map((item) {
-            return DropdownMenuItem(
-              value: item,
-              child: Text(item),
-            );
-          }).toList(),
-          onChanged: onChanged,
-        ),
 
-      ],
-    );
-  }
-
-  Widget _buildTextInput({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
-            hintText: hint,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
