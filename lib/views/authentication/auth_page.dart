@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:pedals/routes/app_routes.dart';
 import 'package:pedals/views/authentication/forgot_pass_page.dart';
 import 'package:pedals/views/users/user_dashboard.dart';
 
@@ -65,47 +66,54 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
 
               Text("Pedals", style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold)),
               SizedBox(height: 30.h),
-              DefaultTabController(
-                  length: 2,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 45.h,
-                        width: 300.w,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: TabBar(
-                          controller: _tabController,
-                          labelColor: Colors.black,
-                          unselectedLabelColor: Colors.grey,
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          indicatorPadding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
-                          indicator: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          tabs: [
-                            Tab(text: "Login"),
-                            Tab(text: "Sign Up"),
-                          ],
+              Column(
+                children: [
+                  Container(
+                    height: 45.h,
+                    width: 300.w,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        tabBarTheme: const TabBarTheme(
+                          overlayColor: WidgetStatePropertyAll(Colors.transparent),
                         ),
                       ),
-                      SizedBox(height: 10.h),
-                      SizedBox(
-                        height: 450.h,
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: [
-                            _buildLoginForm(),
-                            _buildSignUpForm(),
-                          ],
+                      child: TabBar(
+                        controller: _tabController,
+                        unselectedLabelColor: Colors.grey,
+                        labelColor: Colors.deepPurple,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        indicatorPadding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
+                        indicator: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10.r),
                         ),
+                        tabs: const [
+                          Tab(text: "Login"),
+                          Tab(text: "Sign Up"),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  SizedBox(height: 10.h),
+                  SizedBox(
+                    height: 450.h,
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildLoginForm(),
+                        _buildSignUpForm(),
+                      ],
+                    ),
+                  ),
+                ],
+              )
+
             ],
           ),
         ),
@@ -124,7 +132,17 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
             SizedBox(height: 5.h),
             TextField(
               controller: _loginEmailController,
-              decoration: _inputDecoration("student@kgkite.ac.in"),
+              decoration: InputDecoration(
+                hintText: "student@kgkite.ac.in",
+                hintStyle: TextStyle(color: Colors.grey), // 👈 Grey placeholder
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.grey[200],
+                contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
+              ),
             ),
             SizedBox(height: 10.h),
             Text("Password", style: TextStyle(color: Colors.black)),
@@ -132,9 +150,19 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
             TextField(
               controller: _loginPasswordController,
               obscureText: true,
-              decoration: _inputDecoration("Enter password"),
+              decoration: InputDecoration(
+                hintText: "Enter password",
+                hintStyle: TextStyle(color: Colors.grey), // 👈 Grey placeholder
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.grey[200],
+                contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
+              ),
             ),
-            SizedBox(height: 20.h),
+          SizedBox(height: 20.h),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -149,7 +177,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                     String result = await authService.loginUser(credentials);
 
                     if (result == "success") {
-                      Get.offAll(MapsPage(uemail: email,));
+                      Get.offAll(UserDashboard(uemail: email,));
                       // Navigate to the next screen or show success message
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text("Login successful!")),
@@ -180,51 +208,37 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                 },
                 child: Text(
                   "Forgot Password?",
-                  style: TextStyle(fontSize: 14.sp, color: Colors.blue),
+                  style: TextStyle(fontSize: 14.sp, color: Colors.deepPurple),
                 ),
               ),
             ),
             SizedBox(height: 90.h),
 
-            // Guest Login as outlined TextButton
-            Center(
-              child: TextButton(
-                onPressed: () {
-                  // Handle guest login
-                },
-                style: TextButton.styleFrom(
-                  side: BorderSide(color: Colors.grey, width: 1.5),
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical:2.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  "Guest Login",
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 7.h),
 
             // Admin Login as TextButton
             Center(
               child: TextButton(
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                  backgroundColor: Colors.deepPurple[100], // Light purple background
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.r), // Rounded corners
+                  ),
+                ),
                 onPressed: () {
-                  // Handle admin login
+                  // Navigating to the AdminLoginPage using GetX
+                  Get.toNamed(AppRoutes.adminLogin);
                 },
                 child: Text(
                   "Admin Login",
                   style: TextStyle(
                     fontSize: 14.sp,
-                    color: Colors.deepPurple,
+                    color: Colors.deepPurple[800], // Darker text for contrast
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
@@ -356,7 +370,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
 
   ButtonStyle _buttonStyle() {
     return ElevatedButton.styleFrom(
-      backgroundColor: Colors.blue,
+      backgroundColor: Colors.deepPurpleAccent,
       padding: EdgeInsets.symmetric(vertical: 12.h),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.r),

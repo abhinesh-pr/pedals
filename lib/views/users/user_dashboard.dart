@@ -8,16 +8,16 @@ import 'dart:ui' as ui;
 import '../../services/cycle_services.dart';
 import '../../viewmodels/cycle_slot_model.dart';
 
-class MapsPage extends StatefulWidget {
+class UserDashboard extends StatefulWidget {
   final String? uemail;
 
-  const MapsPage({Key? key, required this.uemail}) : super(key: key);
+  const UserDashboard({Key? key, required this.uemail}) : super(key: key);
 
   @override
-  State<MapsPage> createState() => _MapsPageState();
+  State<UserDashboard> createState() => _UserDashboard();
 }
 
-class _MapsPageState extends State<MapsPage> {
+class _UserDashboard extends State<UserDashboard> {
   String username = '';
   String userId = '';
 
@@ -41,10 +41,10 @@ class _MapsPageState extends State<MapsPage> {
 
   // Pins in normalized image coordinates (0.0 to 1.0)
   final List<Map<String, double>> pins = [
-    {"x": 0.08, "y": 0.45},
-    {"x": 0.43, "y": 0.98},
+    {"x": 0.9, "y": 0.9},
+    {"x": 0.01, "y": 0.01},
     {"x": 0.53, "y": 0.67},
-    {"x": 0.65, "y": 0.3},
+    {"x": 0.2, "y": 0.4},
     {"x": 0.58, "y": 0.55},
     {"x": 0.30, "y": 0.80},
   ];
@@ -212,7 +212,7 @@ class _MapsPageState extends State<MapsPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.account_circle_outlined, size: 28, color: Colors.black,),
-            onPressed: () {Get.to(ProfilePage(username: username, useremail: widget.uemail, userId: userId, lastCycle: 'CYCLE_01',));},
+            onPressed: () {Get.to(ProfilePage());},
           ),
         ],
         elevation: 0,

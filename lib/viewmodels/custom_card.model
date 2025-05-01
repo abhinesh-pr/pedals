@@ -1,0 +1,16 @@
+// lib/models/custom_card_model.dart
+
+
+class CustomCardModel {
+  final String title;
+  final String subtitle;
+  final String buttonText;
+  final String routeName;
+
+  CustomCardModel({
+    required this.title,
+    required this.subtitle,
+    required this.buttonText,
+    required this.routeName,
+  });
+}
