@@ -170,33 +170,7 @@ class _AuthPageState extends State<AdminLoginPage> with SingleTickerProviderStat
                 ),
               ),
             ),
-            SizedBox(height: 90.h),
-
-            // Guest Login as outlined TextButton
-
-            Center (
-              child: ElevatedButton(
-                onPressed: () {
-                  Get.toNamed(AppRoutes.guestLogin);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple, // Change to your desired color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18), // Rounded shape
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 13.h), // Padding
-                  elevation: 4,
-                ),
-
-                child: Text(
-                  "Guest Login",
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    color: Colors.white, // Better contrast
-                  ),
-                ),
-              ),
-            ),
+            SizedBox(height: 65.h),
 
 
             SizedBox(height: 23.h),
@@ -207,7 +181,7 @@ class _AuthPageState extends State<AdminLoginPage> with SingleTickerProviderStat
                   padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
                   backgroundColor: Colors.deepPurple[100], // Light purple background
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.r), // Rounded corners
+                    borderRadius: BorderRadius.circular(8.r), // Rounded corners
                   ),
                 ),
                 onPressed: () {

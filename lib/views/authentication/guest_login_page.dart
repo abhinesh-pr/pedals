@@ -178,7 +178,7 @@ class _AuthPageState extends State<GuestLoginPage> with SingleTickerProviderStat
                   padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
                   backgroundColor: Colors.deepPurple[100], // Light purple background
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.r), // Rounded corners
+                    borderRadius: BorderRadius.circular(8.r), // Rounded corners
                   ),
                 ),
                 onPressed: () {

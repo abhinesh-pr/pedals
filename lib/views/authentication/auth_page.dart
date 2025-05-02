@@ -162,7 +162,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                 contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
               ),
             ),
-          SizedBox(height: 20.h),
+            SizedBox(height: 20.h),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -212,33 +212,62 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                 ),
               ),
             ),
-            SizedBox(height: 90.h),
+            SizedBox(height: 80.h),
 
-
-            // Admin Login as TextButton
-            Center(
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-                  backgroundColor: Colors.deepPurple[100], // Light purple background
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.r), // Rounded corners
+            // Admin Login and Guest Login
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Admin Login Button
+                TextButton(
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                    backgroundColor: Colors.deepPurple[100], // Light purple background
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                  onPressed: () {
+                    Get.toNamed(AppRoutes.adminLogin);
+                  },
+                  child: Text(
+                    "Admin Login",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Colors.deepPurple[800], // Darker text for contrast
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                onPressed: () {
-                  // Navigating to the AdminLoginPage using GetX
-                  Get.toNamed(AppRoutes.adminLogin);
-                },
-                child: Text(
-                  "Admin Login",
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.deepPurple[800], // Darker text for contrast
-                    fontWeight: FontWeight.w600,
+
+                SizedBox(width: 16.w), // Space between the two buttons
+
+                // Guest Login Button
+                TextButton(
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                    backgroundColor: Colors.white, // White background
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                      side: BorderSide(color: Colors.deepPurple[100]!), // Border with same purple shade
+                    ),
+                  ),
+                  onPressed: () {
+                    Get.toNamed(AppRoutes.guestLogin); // Make sure this route exists
+                  },
+                  child: Text(
+                    "Guest Login",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Colors.deepPurple[800], // Same deep purple for consistency
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
+              ],
             )
+
+
           ],
         ),
       ),
