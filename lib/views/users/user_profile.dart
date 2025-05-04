@@ -1,13 +1,12 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:pedals/views/authentication/auth_page.dart';
 import 'package:pedals/views/raise_ticket/raise_complaint.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../raise_ticket/complaint_records.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -25,6 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? email;
   String? userId;
   String? lastCycle; // If you want to store this too later
+  bool isExpanded = false;
 
   @override
   void initState() {
@@ -38,6 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController _currentPasswordController = TextEditingController();
   TextEditingController _newPasswordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
+
 
   void _showChangePasswordDialog(BuildContext context) {
     showDialog(
@@ -114,6 +115,55 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  Widget _buildSquareTile(IconData icon, String label) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Color(0xFFE5D8FB),
+        borderRadius: BorderRadius.circular(15.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 8,
+            spreadRadius: 1,
+            offset: Offset(2, 4),
+          ),
+          BoxShadow(
+            color: Colors.white.withOpacity(0.8),
+            blurRadius: 6,
+            spreadRadius: 1,
+            offset: Offset(-2, -2),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 26,
+            color: Colors.deepPurple.shade700,
+          ),
+          SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal, // Enables horizontal scrolling
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis, // Truncate if text overflows
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +173,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
     return Scaffold(
+      backgroundColor: Color(0xFFECE7FB),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight + 1),
         child: ClipRRect(
@@ -132,7 +183,8 @@ class _ProfilePageState extends State<ProfilePage> {
           child: AppBar(
             automaticallyImplyLeading: false,
             elevation: 0,
-            backgroundColor:Color(0xFFD3C6FA),
+            //backgroundColor:Color(0xFFD3C6FA),
+            backgroundColor:Color(0xFFc8b6ff),
             title: Stack(
               alignment: Alignment.center,
               children: [
@@ -166,52 +218,22 @@ class _ProfilePageState extends State<ProfilePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 20.h),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 20.0),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.person),
-                      title: Text(
-                        "${fullName ?? ''}",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    SizedBox(height: 15.h),
-                    ListTile(
-                      leading: Icon(Icons.email),
-                      title: Text(
-                        "${email ?? ''}",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    SizedBox(height: 15.h),
-                    ListTile(
-                      leading: Icon(Icons.drive_eta_rounded),
-                      title: Text(
-                        "${userId ?? ''}",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    SizedBox(height: 15.h),
-                    ListTile(
-                      leading: Icon(Icons.wheelchair_pickup),
-                      title: Text(
-                        "Last Cycle : Cycle_01",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            GridView.count(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              crossAxisSpacing: 12.0,
+              mainAxisSpacing: 12.0,
+              childAspectRatio: 1.8, // Square tiles
+              children: [
+                _buildSquareTile(MdiIcons.account, fullName ?? 'No Name'),
+                _buildSquareTile(MdiIcons.email, email ?? 'No Email'),
+                _buildSquareTile(MdiIcons.cardAccountDetails, userId ?? 'No UserId'),
+                _buildSquareTile(MdiIcons.bicycle, "Cycle_01"),
+              ],
             ),
-            SizedBox(height: 20.h),
+
+            SizedBox(height: 30.h),
             // Raise Issue Section
             Row(
               children: [
@@ -222,21 +244,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     },
                     icon: Padding(
                       padding: EdgeInsets.only(left: 16.0),
-                      child: Icon(Icons.warning),
+                      child: Icon(MdiIcons.alertOctagon,color: Colors.black87,),
                     ),
                     label: Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
                         padding: EdgeInsets.only(left: 8.0),
-                        child: Text('Raise Issue'),
+                        child: Text('Raise Issue',style: TextStyle(color: Colors.black87),),
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
                       foregroundColor:
                       isDarkMode ? Colors.white70 : Colors.black87,
-                      backgroundColor: isDarkMode
-                          ? Colors.white12
-                          : Colors.white54, // Text color based on theme
+                      backgroundColor: Color(0xFFa873e8), // Text color based on theme
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(17.0),
@@ -258,21 +278,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     },
                     icon: Padding(
                       padding: EdgeInsets.only(left: 16.0),
-                      child: Icon(Icons.file_copy),
+                      child: Icon(MdiIcons.history,color: Colors.black87,),
                     ),
                     label: Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
                         padding: EdgeInsets.only(left: 8.0),
-                        child: Text('Issue Records'),
+                        child: Text('Issue Records',style: TextStyle(color: Colors.black87),),
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
                       foregroundColor:
                       isDarkMode ? Colors.white70 : Colors.black87,
-                      backgroundColor: isDarkMode
-                          ? Colors.white12
-                          : Colors.white54, // Text color based on theme
+                      backgroundColor: Color(0xFFa873e8), // Text color based on theme
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(17.0),
@@ -294,21 +312,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     },
                     icon: Padding(
                       padding: EdgeInsets.only(left: 16.0),
-                      child: Icon(Icons.lock),
+                      child: Icon(MdiIcons.keyChange,color: Colors.black87,),
                     ),
                     label: Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
                         padding: EdgeInsets.only(left: 8.0),
-                        child: Text('Change Password'),
+                        child: Text('Change Password',style: TextStyle(color: Colors.black87),),
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
                       foregroundColor:
                       isDarkMode ? Colors.white70 : Colors.black87,
-                      backgroundColor: isDarkMode
-                          ? Colors.white12
-                          : Colors.white54, // Text color based on theme
+                      backgroundColor: Color(0xffa873e8), // Text color based on theme
                       padding: EdgeInsets.symmetric(
                           vertical:
                           16.0), // Add padding to increase button height
