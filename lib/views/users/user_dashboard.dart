@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pedals/views/users/user_profile.dart';
 import 'dart:ui' as ui;
 import '../../services/cycle_services.dart';
@@ -187,6 +188,7 @@ class _UserDashboard extends State<UserDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     if (_image == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -194,37 +196,46 @@ class _UserDashboard extends State<UserDashboard> {
     final aspectRatio = _image!.width / _image!.height;
 
     return Scaffold(
-      appBar: AppBar(
-        title: RichText(
-          text: TextSpan(
-            children: [
-              const TextSpan(
-                text: "Pedals",
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+      backgroundColor: Color(0xFFECE7FB),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight + 1),
+        child: ClipRRect(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(30),
+          ),
+          child: AppBar(
+            automaticallyImplyLeading: false,
+            elevation: 0,
+            backgroundColor:Color(0xFFD1C3FB),
+            title: Stack(
+              alignment: Alignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: Icon(Icons.account_circle_outlined),
+                    onPressed: () {
+                      Get.to(ProfilePage());
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.account_circle_outlined, size: 28, color: Colors.black,),
-            onPressed: () {Get.to(ProfilePage());},
-          ),
-        ],
-        elevation: 0,
-        backgroundColor: Colors.white,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0), // Set height of the bottom border
-          child: Container(
-            color:   Color(0xFFCFCFCF), // Set border color //isDarkMode ? Color(0xFF515151) :
-            height: 0.7, // Set border thickness
+                RichText(
+                  text: TextSpan(
+                    text: "PEDALS",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                      color: Color(0xFF000000),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
+
+
       body: LayoutBuilder(
         builder: (context, constraints) {
           final containerWidth = constraints.maxWidth;

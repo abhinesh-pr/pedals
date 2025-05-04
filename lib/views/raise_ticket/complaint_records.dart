@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:pedals/views/raise_ticket/raise_complaint.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:intl/intl.dart';
 
 class ComplaintRecords extends StatefulWidget {
   const ComplaintRecords({super.key,});
@@ -72,20 +71,89 @@ class _ComplaintRecords extends State<ComplaintRecords> {
   Widget build(BuildContext context) {
     if (userId == null) {
       return Scaffold(
-        appBar: AppBar(title: Text('My Complaints', style: TextStyle(color: Colors.white)), actions: [
-          IconButton(onPressed: (){Get.to(ComplaintPage());}, icon: Icon(Icons.add))
-        ],),
+        backgroundColor: Color(0xFFECE7FB),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight + 1),
+          child: ClipRRect(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(30),
+            ),
+            child: AppBar(
+              automaticallyImplyLeading: false,
+              elevation: 0,
+              //backgroundColor:Color(0xFFD3C6FA),
+              backgroundColor:Color(0xFFc8b6ff),
+              title: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  RichText(
+                    text: TextSpan(
+                      text: "My Complaint",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                        color: Color(0xFF000000),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         body: _buildShimmerLoading(),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text('My Complaints', style: TextStyle(color: Colors.white)),
-        actions: [IconButton(onPressed: (){Get.to(ComplaintPage());}, icon: Icon(Icons.add, color: Colors.white,))],
-        backgroundColor: Colors.red,
-        elevation: 0,
+      backgroundColor: Color(0xFFECE7FB),
+
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight + 1),
+        child: ClipRRect(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(30),
+          ),
+          child: AppBar(
+            automaticallyImplyLeading: false,
+            elevation: 0,
+            //backgroundColor:Color(0xFFD3C6FA),
+            backgroundColor:Color(0xFFc8b6ff),
+            title: Stack(
+              alignment: Alignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back),color: Colors.black,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                RichText(
+                  text: TextSpan(
+                    text: "My Complaints",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                      color: Color(0xFF000000),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: isLoading
           ? _buildShimmerLoading()
@@ -98,13 +166,7 @@ class _ComplaintRecords extends State<ComplaintRecords> {
           final complaint = userComplaints[index];
           final complaintDate = complaint['complaintDate'] ?? '';
           final dateOnly = complaintDate.toString().split('T')[0];
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildDateHeader(dateOnly),
-              _buildComplaintCard(context, complaint),
-            ],
-          );
+          return  _buildComplaintCard(context, complaint, dateOnly);
         },
       ),
     );
@@ -148,70 +210,92 @@ class _ComplaintRecords extends State<ComplaintRecords> {
     );
   }
 
-  Widget _buildDateHeader(String dateKey) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 8),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.calendar_today, size: 18, color: Colors.red),
-          SizedBox(width: 8),
-          Text(
-            dateKey,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: Colors.red,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildComplaintCard(BuildContext context, Map<String, dynamic> complaint) {
+  Widget _buildComplaintCard(BuildContext context, Map<String, dynamic> complaint, String dateOnly) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 4,
-      color: Colors.white,
+      color: Color(0xFFE5D8FB),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(complaint['category'] ?? 'Category', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black)),
-            SizedBox(height: 8),
-            Text(complaint['description'] ?? 'No description', style: TextStyle(color: Colors.grey, fontSize: 14)),
-            SizedBox(height: 8),
+            // Category and Date in one row
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(Icons.pending, color: Colors.purple, size: 20),
-                SizedBox(width: 8),
                 Text(
-                  'Status: ${complaint['complaint_status'] ?? 'Unknown'}',
-                  style: TextStyle(fontWeight: FontWeight.w600, color: Colors.purpleAccent, fontSize: 14),
+                  complaint['category'] ?? 'Category',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                ),
+                Text(
+                  dateOnly,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () {
-                  _showTrackingBottomSheet(context, complaint);
-                },
-                child: Text('Track Complaint', style: TextStyle(fontSize: 14, color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                ),
+            SizedBox(height: 8),
+
+            // Description
+            Text(
+              complaint['description'] ?? 'No description',
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 14,
               ),
+            ),
+            SizedBox(height: 20),
+
+            // Status and Track Button Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Status: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      '${complaint['complaint_status'] ?? 'Unknown'}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: _getStatusColor(complaint['complaint_status']),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _showTrackingBottomSheet(context, complaint);
+                  },
+                  child: Text(
+                    'Track Complaint',
+                    style: TextStyle(fontSize: 14, color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF9d4edd),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -219,8 +303,23 @@ class _ComplaintRecords extends State<ComplaintRecords> {
     );
   }
 
+  Color _getStatusColor(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'submitted':
+        return Color(0xfffcbf49);
+      case 'under review':
+        return Colors.blue;
+      case 'in progress':
+        return Colors.orange;
+      case 'resolved':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
   void _showTrackingBottomSheet(BuildContext context, Map<String, dynamic> complaint) {
-    String complaintStatus = "Resolved"; // Dynamically change based on data
+    String complaintStatus = "${complaint['complaint_status'] ?? 'Unknown'}"; // Dynamically change based on data
 
     showModalBottomSheet(
       context: context,
@@ -236,8 +335,9 @@ class _ComplaintRecords extends State<ComplaintRecords> {
             return Container(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                color:Color(0xFFECE7FB),
+
+              borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black12,
@@ -262,7 +362,15 @@ class _ComplaintRecords extends State<ComplaintRecords> {
                   ),
                   Text(
                     'Track Complaint',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      decoration: TextDecoration.underline, // Underline the text
+                      decorationColor: Colors.black, // Color of the underline
+                      height: 1.5, // Optional: Add some line height to increase the space between text and underline
+                    ),
+
                   ),
                   SizedBox(height: 16),
                   _infoLine("Category", "${complaint['category'] ?? 'Unknown'}"),
@@ -274,10 +382,17 @@ class _ComplaintRecords extends State<ComplaintRecords> {
                     _infoLine("Resolved By", "${complaint['resolved_by'] ?? 'Unknown'}"),
                   ],
                   SizedBox(height: 24),
-                  Divider(thickness: 1.2),
+                  Divider(thickness: 1.2,color:  Color(0xFF9d4edd),),
                   Text(
                     "Status Timeline",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      decoration: TextDecoration.underline, // Underline the text
+                      decorationColor: Colors.black, // Color of the underline
+                      height: 1.5, // Optional: Add some line height to increase the space between text and underline
+                    ),
                   ),
                   SizedBox(height: 20),
                   _buildTimeline(complaintStatus),
@@ -327,7 +442,7 @@ class _ComplaintRecords extends State<ComplaintRecords> {
   Widget _buildTimeline(String currentStatus) {
     final steps = ["Submitted", "Under Review", "In Progress", "Resolved"];
     final stepColors = {
-      "Submitted": Colors.yellow,
+      "Submitted": Color(0xfffcbf49),
       "Under Review": Colors.blue,
       "In Progress": Colors.orange,
       "Resolved": Colors.green,
@@ -400,17 +515,37 @@ class _ComplaintRecords extends State<ComplaintRecords> {
 
 
   Widget _infoLine(String title, String value) {
+    // Parse and format the date if it's a valid datetime string
+    String formattedDate = '';
+    try {
+      DateTime parsedDate = DateTime.parse(value); // Assuming `value` is a valid date string
+      formattedDate = DateFormat('yyyy-MM-dd hh:mm a').format(parsedDate); // Example format: 2025-05-04 02:30 PM
+    } catch (e) {
+      formattedDate = value; // If not a valid date, display as is
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(flex: 3, child: Text(title, style: TextStyle(fontWeight: FontWeight.w600))),
-          Expanded(flex: 5, child: Text(value, style: TextStyle(color: Colors.black87))),
+          Expanded(
+            flex: 3,
+            child: Text(
+              title,
+              style: TextStyle(fontWeight: FontWeight.w900, color: Colors.black87),
+            ),
+          ),
+          Expanded(
+            flex: 5,
+            child: Text(
+              formattedDate, // Use the formatted date here
+              style: TextStyle(color: Colors.black87),
+            ),
+          ),
         ],
       ),
     );
   }
-
 
 }

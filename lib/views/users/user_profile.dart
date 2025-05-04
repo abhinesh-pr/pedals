@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pedals/views/authentication/auth_page.dart';
 import 'package:pedals/views/raise_ticket/raise_complaint.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -122,8 +123,42 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
     return Scaffold(
-      appBar: AppBar(
-        title: Center(child: Text('Profile Page')),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight + 1),
+        child: ClipRRect(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(30),
+          ),
+          child: AppBar(
+            automaticallyImplyLeading: false,
+            elevation: 0,
+            backgroundColor:Color(0xFFD3C6FA),
+            title: Stack(
+              alignment: Alignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back),color: Colors.black,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                RichText(
+                  text: TextSpan(
+                    text: "Profile",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                      color: Color(0xFF000000),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),

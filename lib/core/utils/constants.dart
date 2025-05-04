@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 
-// Primary Colors
-const primaryColor = Colors.indigo; // Material Indigo
-const secondaryColor = Colors.blueAccent; // Material Light Blue
-const tertiaryColor = Colors.orangeAccent; // Material Orange Accent
+// Primary Colors (Lavender Theme)
+const primaryColor = Color(0xFFB57EDC); // Lavender
+const secondaryColor = Color(0xFFD6B4FC); // Light Lavender
+const tertiaryColor = Color(0xFFE6CCFF); // Pale Lavender
 
-// Text Colors
-const darkTextColor = Colors.black87; // Dark Text
-const lightTextColor = Colors.blueGrey; // Material Blue Grey
-const headlineTextColor = Colors.black; // Material Black
+// Text Colors (Responsive to Theme)
+const darkTextColor = Colors.black; // Light Theme Text
+const lightTextColor = Colors.white; // Dark Theme Text
+const headlineTextColor = Colors.black; // Default to black for headlines
 
 // Background Colors
-var backgroundColor = Colors.grey[50]; // Light Grey Background
+var backgroundColor = Color(0xFFF5F3FF); // Very light lavender background
 const cardBackgroundColor = Colors.white; // White Card
-var overlayBackgroundColor = Colors.grey[200]; // Light Grey Overlay
+var overlayBackgroundColor = Color(0xFFEDE7F6); // Light Lavender Overlay
 
 // Accent Colors
-const successColor = Colors.green; // Material Green
-const errorColor = Colors.red; // Material Red
-const warningColor = Colors.yellow; // Material Yellow
+const successColor = Color(0xFF81C784); // Soft Green
+const errorColor = Color(0xFFE57373); // Soft Red
+const warningColor = Color(0xFFFFF176); // Soft Yellow
 
 // Grayscale
 const grayDark = Colors.grey; // Material Grey
@@ -37,8 +37,6 @@ const secondaryGradient = LinearGradient(
   end: Alignment.centerRight,
   colors: [tertiaryColor, primaryColor],
 );
-
-
 
 // Example Asset Paths (Placeholder for illustration)
 class AppImages {

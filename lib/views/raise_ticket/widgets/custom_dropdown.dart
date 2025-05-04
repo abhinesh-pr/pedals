@@ -46,16 +46,15 @@ class CustomDropdown extends StatelessWidget {
                 ),
               ],
             ),
-            child: DropdownButtonFormField<String>(
+            child :DropdownButtonFormField<String>(
               value: value,
               isExpanded: true,
+              style: GoogleFonts.lato(
+                fontSize: 14,
+                color: Colors.black, // for selected text
+              ),
               decoration: InputDecoration(
-                hintText: hint,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                hintStyle: GoogleFonts.lato(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -72,9 +71,16 @@ class CustomDropdown extends StatelessWidget {
                   ),
                 ),
               ),
+              hint: Text( // 👈 This replaces hintText in InputDecoration
+                hint,
+                style: GoogleFonts.lato(
+                  fontSize: 14,
+                  color: Colors.black54, // 👈 This WILL be applied
+                ),
+              ),
               icon: const Icon(Icons.arrow_drop_down, color: Colors.black54, size: 30),
               dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(16), // 👈 Added to curve the dropdown popup
+              borderRadius: BorderRadius.circular(16),
               items: items.map((item) {
                 return DropdownMenuItem(
                   value: item,
@@ -91,7 +97,6 @@ class CustomDropdown extends StatelessWidget {
                 );
               }).toList(),
               onChanged: onChanged,
-              
             ),
           ),
         ],

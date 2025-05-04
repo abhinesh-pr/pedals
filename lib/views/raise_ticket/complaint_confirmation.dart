@@ -12,7 +12,6 @@ class ComplaintConfirmationPage extends StatelessWidget {
   final String category;
   final String service;
   final String description;
-  //final List<String> uploadedFiles;
 
   const ComplaintConfirmationPage({
     super.key,
@@ -21,37 +20,47 @@ class ComplaintConfirmationPage extends StatelessWidget {
     required this.category,
     required this.service,
     required this.description,
-    //required this.uploadedFiles,
   });
-
-  String? get mycomplaints_view => null;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(
-          "Complaint Submitted",
-          style: GoogleFonts.lato(color: Colors.white),
+      backgroundColor: const Color(0xFFECE7FB),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight + 1),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(
+            bottom: Radius.circular(30),
+          ),
+          child: AppBar(
+            automaticallyImplyLeading: false,
+            elevation: 0,
+            backgroundColor: const Color(0xFFc8b6ff),
+            centerTitle: true,
+            title: RichText(
+              text: TextSpan(
+                text: "Overview",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
         ),
-        backgroundColor: Colors.red,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Success Icon
             Lottie.asset(
               'assets/lotties/success_lottie.json',
               height: 80,
               repeat: false,
             ),
             const SizedBox(height: 16),
-
-            // Success Message
             Text(
               "Complaint Submitted Successfully!",
               textAlign: TextAlign.center,
@@ -62,8 +71,6 @@ class ComplaintConfirmationPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-
-            // Complaint ID
             Text(
               "Your Complaint ID:",
               style: GoogleFonts.lato(fontSize: 16, color: Colors.black87),
@@ -73,12 +80,10 @@ class ComplaintConfirmationPage extends StatelessWidget {
               style: GoogleFonts.lato(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.red,
+                color:  Color(0xFF9d4edd),
               ),
             ),
             const SizedBox(height: 24),
-
-            // Progress Indicator for Next Steps
             Text(
               "Next Steps",
               style: GoogleFonts.lato(
@@ -88,14 +93,13 @@ class ComplaintConfirmationPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            _buildProgressStep("Complaint Received", true),
+            _buildProgressStep("Submitted", true),
             _buildProgressStep("Under Review", false),
-            _buildProgressStep("Resolution In Progress", false),
-            _buildProgressStep("Resolution Completed", false),
-
+            _buildProgressStep("In Progress", false),
+            _buildProgressStep("Resolved", false),
             const SizedBox(height: 24),
 
-            // Complaint Details Section
+            // 👇 "Complaint Details" Text and Card Design
             Text(
               "Complaint Details",
               style: GoogleFonts.lato(
@@ -104,55 +108,37 @@ class ComplaintConfirmationPage extends StatelessWidget {
                 color: Colors.black87,
               ),
             ),
-            const SizedBox(height: 16),
-            _buildDetailRow("Category", category),
-            _buildDetailRow("Service", service),
             const SizedBox(height: 12),
 
-            // Description Section
-            Text(
-              "Description",
-              style: GoogleFonts.lato(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+            // 👇 New Card Design for Complaint Summary
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              color: Color(0xffe2d0ff),
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _cardRow("Category:", category),
+                    const SizedBox(height: 12),
+                    _cardRow("Service:", service),
+                    const SizedBox(height: 12),
+                    _cardRow("Details:", description),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: GoogleFonts.lato(fontSize: 16, color: Colors.black54),
-            ),
-            const SizedBox(height: 16),
 
-            // Uploaded Files Section
-            // if (uploadedFiles.isNotEmpty) ...[
-            //   Text(
-            //     "Uploaded Files",
-            //     style: GoogleFonts.lato(
-            //       fontSize: 18,
-            //       fontWeight: FontWeight.bold,
-            //       color: Colors.black87,
-            //     ),
-            //   ),
-            //   const SizedBox(height: 8),
-            //   ...uploadedFiles.map((file) => ListTile(
-            //     leading: Icon(Icons.insert_drive_file, color: Colors.red),
-            //     title: Text(
-            //       file.split('/').last,
-            //       style: GoogleFonts.lato(fontSize: 16),
-            //     ),
-            //   )),
-            //   const SizedBox(height: 16),
-            // ],
-
-            // Navigation Button
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
                 Get.to(UserDashboard(uemail: email));
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor:  Color(0xFF9d4edd),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -171,34 +157,6 @@ class ComplaintConfirmationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "$title: ",
-            style: GoogleFonts.lato(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: GoogleFonts.lato(
-                fontSize: 16,
-                color: Colors.black54,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildProgressStep(String stepName, bool isCompleted) {
     return Row(
       children: [
@@ -211,7 +169,32 @@ class ComplaintConfirmationPage extends StatelessWidget {
           stepName,
           style: GoogleFonts.lato(
             fontSize: 16,
-            color: isCompleted ? Colors.black87 : Colors.grey,
+            color: isCompleted ? Colors.black87 : Colors.black54,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _cardRow(String title, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "$title  ",
+          style: GoogleFonts.lato(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: GoogleFonts.lato(
+              fontSize: 16,
+              color: Color(0xff353535),
+            ),
           ),
         ),
       ],

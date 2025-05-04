@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'constants.dart';
 
+bool isDarkMode = false;  // Global variable to check if it's dark mode or not
+
 // Define light theme
-ThemeData lightTheme = ThemeData(
+final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   primaryColor: primaryColor, // Vibrant Indigo
   hintColor: grayLight, // Subtle Gray
@@ -35,7 +37,7 @@ ThemeData lightTheme = ThemeData(
 );
 
 // Define dark theme
-ThemeData darkTheme = ThemeData(
+final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   primaryColor: primaryColor, // Vibrant Indigo
   hintColor: gray, // Medium Gray for hints

@@ -12,6 +12,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:pedals/views/raise_ticket/widgets/custom_dropdown.dart';
 
+import '../../core/utils/constants.dart';
 import '../../viewmodels/complaints_data.dart';
 import '../../viewmodels/complaint_model.dart';
 import 'complaint_confirmation.dart';
@@ -26,6 +27,10 @@ class ComplaintPage extends StatefulWidget {
 }
 
 class _ComplaintPage extends State<ComplaintPage> {
+
+  double _scale = 1.0;
+
+
   String? email;
 
   String? selectedCategory;
@@ -241,17 +246,44 @@ class _ComplaintPage extends State<ComplaintPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.redAccent,
-        title: Text(
-          'Raise a Complaint',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-            color: Colors.white,
+      backgroundColor: Color(0xFFECE7FB),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight + 1),
+        child: ClipRRect(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(30),
+          ),
+          child: AppBar(
+            automaticallyImplyLeading: false,
+            elevation: 0,
+            //backgroundColor:Color(0xFFD3C6FA),
+            backgroundColor:Color(0xFFc8b6ff),
+            title: Stack(
+              alignment: Alignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back),color: Colors.black,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                RichText(
+                  text: TextSpan(
+                    text: "New Complaint",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                      color: Color(0xFF000000),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -286,6 +318,7 @@ class _ComplaintPage extends State<ComplaintPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 12),
           CustomDropdown(
             label: 'Category',
             value: selectedCategory,
@@ -363,23 +396,38 @@ class _ComplaintPage extends State<ComplaintPage> {
               ),
             )),
           const SizedBox(height: 30),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _handleSubmit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: Text(
-                'Submit Complaint',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
+          GestureDetector(
+            onTapDown: (_) => setState(() => _scale = 0.97),
+            onTapUp: (_) {
+              setState(() => _scale = 1.0);
+              _handleSubmit();
+            },
+            onTapCancel: () => setState(() => _scale = 1.0),
+            child: AnimatedScale(
+              scale: _scale,
+              duration: const Duration(milliseconds: 100),
+              curve: Curves.easeInOut,
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _handleSubmit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF9d4edd),
+                    elevation: 4,
+                    shadowColor: Colors.grey.withOpacity(0.3),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: Text(
+                    'Submit Complaint',
+                    style: GoogleFonts.lato(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),
