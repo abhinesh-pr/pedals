@@ -1,0 +1,389 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:get/get.dart';
+import 'dart:ui' as ui;
+import '../../services/cycle_services.dart';
+import '../../viewmodels/cycle_slot_model.dart';
+import 'package:pedals/views/users/user_profile.dart';
+
+class UserDashboard extends StatefulWidget {
+  final String? uemail;
+
+  const UserDashboard({Key? key, required this.uemail}) : super(key: key);
+
+  @override
+  State<UserDashboard> createState() => _UserDashboard();
+}
+
+class _UserDashboard extends State<UserDashboard> with TickerProviderStateMixin {
+  String username = '';
+  String userId = '';
+
+  int? selectedPinIndex;
+  final CycleService _cycleService = CycleService();
+  List<CycleSlot> fetchedCycles = [];
+  final Map<int, List<CycleSlot>> pinCycles = {};
+  final Map<int, Stream<List<CycleSlot>>> pinStreams = {};
+  ui.Image? _image;
+  final TransformationController _transformationController = TransformationController();
+  late AnimationController _mapAnimationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<Offset> _positionAnimation;
+
+
+  final Map<int, String> pinStandMap = {
+    0: "STAND_A",
+    1: "STAND_B",
+    2: "STAND_C",
+    3: "STAND_D",
+    4: "STAND_E",
+    5: "STAND_F",
+  };
+
+  final List<Map<String, double>> pins = [
+    {"x": 0.9, "y": 0.9},
+    {"x": 0.01, "y": 0.01},
+    {"x": 0.53, "y": 0.67},
+    {"x": 0.2, "y": 0.4},
+    {"x": 0.58, "y": 0.55},
+    {"x": 0.30, "y": 0.80},
+  ];
+
+  final List<String> pinLabels = ["1", "2", "3", "4", "5", "6"];
+
+
+  List<Map<String, dynamic>> demoSlots = [];
+
+  void _initDemoCycleSlots() {
+    demoSlots = List.generate(3, (index) {
+      final showCycle = index != 2 && (index == 0 || (DateTime.now().second % 2 == 0));
+      return {
+        'slotId': index + 1,
+        'cycleId': showCycle ? 'Cycle_\${index + 101}' : '',
+        'status': showCycle ? 'locked' : 'empty',
+      };
+    });
+  }
+
+  Future<void> fetchUserData(String email) async {
+    try {
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (userSnapshot.docs.isNotEmpty) {
+        final userDocId = userSnapshot.docs.first.id;
+        final userDoc = await FirebaseFirestore.instance.collection('users').doc(userDocId).get();
+
+        if (userDoc.exists) {
+          final data = userDoc.data()!;
+          setState(() {
+            username = data['fullName'] ?? '';
+            userId = userDocId;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error fetching user data: \$e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadImage('assets/images/map.jpg');
+    fetchUserData(widget.uemail ?? '');
+
+
+    _mapAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.8).animate(
+      CurvedAnimation(parent: _mapAnimationController, curve: Curves.easeOut),
+    );
+
+    _positionAnimation = Tween<Offset>(begin: Offset.zero, end: const Offset(0, -0.3)).animate(
+      CurvedAnimation(parent: _mapAnimationController, curve: Curves.easeOut),
+    );
+
+    pinStandMap.forEach((pinIndex, standId) {
+      final stream = _cycleService.getRealtimeSlots(standId);
+      pinStreams[pinIndex] = stream;
+
+      stream.listen((cycles) {
+        if (!mounted) return;
+        setState(() {
+          if (selectedPinIndex == pinIndex) {
+            // Tapped same pin: close card and reset map view
+            selectedPinIndex = null;
+            _resetMapToInitialView(); // <-- implement this to scale map back
+          } else {
+            // New pin: show its info
+            _initDemoCycleSlots(); // you can skip this if you're using real slots
+            selectedPinIndex = pinIndex;
+            _animateMapForSelectedPin(); // <-- optional: add your scaling logic here
+          }
+        });
+      });
+    });
+
+
+  }
+
+
+  Future<void> _loadImage(String path) async {
+    final data = await rootBundle.load(path);
+    final image = await decodeImageFromList(data.buffer.asUint8List());
+    if (!mounted) return;
+    setState(() => _image = image);
+  }
+
+  Widget _buildSlotCard(Map<String, dynamic> slot) {
+    final slotId = slot['slotId'];
+    final isEmpty = (slot['cycleId'] as String).isEmpty;
+    final isLocked = slot['status'] == 'locked';
+
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            const Icon(Icons.pedal_bike, size: 30),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Slot ${slot['slotId']}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    slot['cycleId'].isEmpty ? 'No Cycle' : slot['cycleId'],
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: slot['cycleId'].isEmpty ? Colors.grey : Colors.black,
+                    ),
+                  ),
+
+                ],
+              ),
+            ),
+            isEmpty
+                ? const Text('Empty', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600))
+                : ElevatedButton.icon(
+              icon: Icon(isLocked ? Icons.lock : Icons.lock_open, color: Colors.white, size: 18),
+              label: Text(isLocked ? "Locked" : "Unlocked"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isLocked ? Colors.redAccent : Colors.green,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+                onPressed: () {
+                  if (!isLocked) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("This cycle is already unlocked."),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("You cannot unlock cycles through the app right now."),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_image == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final aspectRatio = _image!.width / _image!.height;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Pedals", style: TextStyle(color: Colors.blue, fontSize: 20, fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.account_circle_outlined, size: 28, color: Colors.black),
+            onPressed: () => Get.to(ProfilePage()),
+          ),
+        ],
+        elevation: 0,
+        backgroundColor: Colors.white,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.0),
+          child: Container(color: const Color(0xFFCFCFCF), height: 0.7),
+        ),
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final containerWidth = constraints.maxWidth;
+          final containerHeight = constraints.maxHeight;
+
+          const double horizontalPadding = 20.0;
+          final availableWidth = containerWidth - (2 * horizontalPadding);
+
+          double displayWidth = availableWidth;
+          double displayHeight = availableWidth / aspectRatio;
+
+          if (displayHeight > containerHeight * 0.6) {
+            displayHeight = containerHeight * 0.6;
+            displayWidth = displayHeight * aspectRatio;
+          }
+
+          final double centerY = (containerHeight - displayHeight) / 2;
+          final double targetTop = 40.0;
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Stack(
+                    children: [
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                        top: selectedPinIndex != null ? targetTop : centerY,
+                        left: (containerWidth - displayWidth) / 2 - horizontalPadding,
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: InteractiveViewer(
+                                transformationController: _transformationController,
+                                minScale: 1.0,
+                                maxScale: 5.0,
+                                clipBehavior: Clip.hardEdge,
+                                panEnabled: true,
+                                constrained: true,
+                                boundaryMargin: const EdgeInsets.all(0),
+                                child: SizedBox(
+                                  width: displayWidth,
+                                  height: displayHeight,
+                                  child: Stack(
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/map.jpg',
+                                        width: displayWidth,
+                                        height: displayHeight,
+                                        fit: BoxFit.fill,
+                                      ),
+                                      ...pins.asMap().entries.map((entry) {
+                                        int index = entry.key;
+                                        Map<String, double> pin = entry.value;
+                                        final left = pin["x"]! * displayWidth;
+                                        final top = pin["y"]! * displayHeight;
+                                        return Positioned(
+                                          left: left - 18,
+                                          top: top - 36,
+                                          child: GestureDetector(
+                                              onTap: () {
+                                                cycleSlotSelectionController.sink.add(index); // 🔄 Only use stream
+                                              },
+                                              child: Column(
+                                              children: [
+                                                const Icon(Icons.location_on, color: Colors.red, size: 36),
+                                                const SizedBox(height: 1),
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white.withOpacity(0.5),
+                                                    borderRadius: BorderRadius.circular(6),
+                                                  ),
+                                                  child: Text(
+                                                    pinLabels[index],
+                                                    style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            AnimatedOpacity(
+                              duration: const Duration(milliseconds: 500),
+                              opacity: selectedPinIndex != null ? 1.0 : 0.0,
+                              child: selectedPinIndex != null
+                                  ? Container(
+                                width: displayWidth,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    const Text(
+                                      'Cycle Status (Static Demo)',
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    ...demoSlots.map(_buildSlotCard).toList(),
+                                  ],
+                                ),
+                              )
+                                  : const SizedBox(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+mixin cycleSlotSelectionController {
+}
+
+void _resetMapToInitialView() {
+  _transformationController.value = Matrix4.identity();
+}
+
+class _transformationController {
+  static Matrix4 value;
+}
+
